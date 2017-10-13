@@ -6,4 +6,12 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+$int = '\d+';
+
+Route::group(['middleware' => ['auth']], function() use($int) {
+    Route::get('home', [
+        'as' => 'home.get',
+        'uses' => 'HomeController@index',
+    ]);
+    require __DIR__.'/task.php';
+});
