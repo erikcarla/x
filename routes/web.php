@@ -1,17 +1,16 @@
 <?php
 
-Route::get('/', function () {
-    return view('welcome');
-});
+$int = '\d+';
 
 Auth::routes();
 
-$int = '\d+';
+Route::get('rss', [
+    'as' => 'rss',
+    'uses' => 'RssController@index',
+]);
+require __DIR__.'/activate.php';
+require __DIR__.'/home.php';
 
 Route::group(['middleware' => ['auth']], function() use($int) {
-    Route::get('home', [
-        'as' => 'home.get',
-        'uses' => 'HomeController@index',
-    ]);
-    require __DIR__.'/task.php';
+    require __DIR__.'/admin.php';
 });

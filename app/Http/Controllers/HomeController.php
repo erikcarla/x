@@ -2,54 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Lib\Task\Service\CreateTask;
-use App\Lib\Task\Service\DeleteTask;
-use App\Http\Requests\TaskRequest;
-use App\Lib\Task\TaskRepository;
-use App\Models\Task;
+use App\Lib\Article\ArticleRepository;
+use App\Helpers\Helper;
 
 use Validator;
 use App;
 
 class HomeController extends Controller
 {
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $tasks = App::make(TaskRepository::class)->getTask();
+        $articles = App::make(ArticleRepository::class)->getAllArticles();
 
-        return view('tasks', [
-            'tasks' => $tasks
+        return view('welcome', [
+            'articles' => $articles
         ]);
     }
 
-    public function store(TaskRequest $request)
+    public function read($id)
     {
-        $task = new CreateTask($this->params());
-        $task->run();
+        $article = App::make(ArticleRepository::class)->getArticle($id);
 
-        return redirect('/home');
-    }
-
-    public function destroy($id)
-    {
-        $task = Task::findOrFail($id);
-
-        $deleteTask = new DeleteTask($task);
-        $deleteTask->run();
-
-        return redirect('/home');
-    }
-
-    private function params()
-    {
-        return request()->only([
-            'name'
+        return view('read', [
+            'article' => $article
         ]);
     }
 
+    public function generate($id)
+    {
+        $article = App::make(ArticleRepository::class)->getArticle($id);
+
+        $html = view('generate', [
+            'article' => $article
+        ]);
+
+        App::make(Helper::class)->generatePdf($html);
+    }
 }
